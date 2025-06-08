@@ -4,6 +4,8 @@ import { XPDashboard } from '@/components/XPDashboard';
 import { XPTracker } from '@/components/XPTracker';
 import { LevelDisplay } from '@/components/LevelDisplay';
 import { Header } from '@/components/Header';
+import { DailyRecord } from '@/components/DailyRecord';
+import { StreakDisplay } from '@/components/StreakDisplay';
 
 const Index = () => {
   const [totalXP, setTotalXP] = useState(() => {
@@ -21,6 +23,8 @@ const Index = () => {
     const saved = localStorage.getItem('weeklyXP');
     return saved ? JSON.parse(saved) : 0;
   });
+
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     localStorage.setItem('divineXP', JSON.stringify(totalXP));
@@ -47,7 +51,9 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         <LevelDisplay totalXP={totalXP} />
         <XPDashboard todayXP={todayXP} weeklyXP={weeklyXP} totalXP={totalXP} />
+        <StreakDisplay totalXP={totalXP} />
         <XPTracker onAddXP={addXP} />
+        <DailyRecord todayXP={todayXP} completedTasks={completedTasks} />
       </div>
     </div>
   );

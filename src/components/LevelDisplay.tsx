@@ -29,26 +29,26 @@ export const LevelDisplay = ({ totalXP }: LevelDisplayProps) => {
   const Icon = levelInfo.icon;
 
   return (
-    <Card className={`p-6 ${levelInfo.bgColor} border-2 border-purple-500/30 backdrop-blur-sm`}>
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3">
-          <Icon className={`w-10 h-10 bg-gradient-to-r ${levelInfo.color} bg-clip-text text-transparent`} />
-          <h2 className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${levelInfo.color} bg-clip-text text-transparent`}>
+    <Card className={`p-4 sm:p-6 ${levelInfo.bgColor} border-2 border-purple-500/30 backdrop-blur-sm`}>
+      <div className="text-center space-y-3 sm:space-y-4">
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
+          <Icon className={`w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r ${levelInfo.color} bg-clip-text text-transparent`} />
+          <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r ${levelInfo.color} bg-clip-text text-transparent`}>
             LEVEL {levelInfo.level}
           </h2>
         </div>
         
-        <h3 className="text-xl md:text-2xl font-semibold text-white">
+        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white px-2">
           {levelInfo.title}
         </h3>
         
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-purple-200">
+          <div className="flex justify-between text-xs sm:text-sm text-purple-200 px-2">
             <span>{totalXP} XP</span>
             <span>{totalXP >= 5001 ? "MAX LEVEL" : `${nextLevelXP} XP`}</span>
           </div>
           
-          <div className="w-full bg-purple-900/50 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-purple-900/50 rounded-full h-2 sm:h-3 overflow-hidden mx-2">
             <div 
               className={`h-full bg-gradient-to-r ${levelInfo.color} transition-all duration-500 ease-out relative`}
               style={{ width: `${progress}%` }}
@@ -59,7 +59,7 @@ export const LevelDisplay = ({ totalXP }: LevelDisplayProps) => {
         </div>
         
         {totalXP < 5001 && (
-          <p className="text-purple-300 text-sm">
+          <p className="text-purple-300 text-xs sm:text-sm">
             {nextLevelXP - totalXP} XP until next level
           </p>
         )}

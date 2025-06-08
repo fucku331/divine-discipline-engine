@@ -77,28 +77,28 @@ export const StreakDisplay = ({ totalXP }: StreakDisplayProps) => {
   ];
 
   return (
-    <Card className="p-6 bg-slate-900/50 border-purple-500/30 backdrop-blur-sm">
-      <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+    <Card className="p-4 sm:p-6 bg-slate-900/50 border-purple-500/30 backdrop-blur-sm">
+      <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
         🔥 DIVINE STREAKS 🔥
       </h2>
       
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {streaks.map((streak) => {
           const Icon = streak.icon;
           
           return (
             <div 
               key={streak.title}
-              className={`p-4 rounded-lg bg-gradient-to-br ${streak.bgColor} border border-purple-500/30`}
+              className={`p-3 sm:p-4 rounded-lg bg-gradient-to-br ${streak.bgColor} border border-purple-500/30`}
             >
-              <div className="text-center space-y-2">
-                <Icon className={`w-8 h-8 mx-auto bg-gradient-to-r ${streak.color} bg-clip-text text-transparent`} />
+              <div className="text-center space-y-1 sm:space-y-2">
+                <Icon className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto bg-gradient-to-r ${streak.color} bg-clip-text text-transparent`} />
                 
-                <div className={`text-2xl font-bold bg-gradient-to-r ${streak.color} bg-clip-text text-transparent`}>
+                <div className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${streak.color} bg-clip-text text-transparent`}>
                   {streak.count}
                 </div>
                 
-                <h3 className="font-semibold text-white text-sm">
+                <h3 className="font-semibold text-white text-xs sm:text-sm">
                   {streak.title}
                 </h3>
                 
@@ -120,10 +120,10 @@ export const StreakDisplay = ({ totalXP }: StreakDisplayProps) => {
       </div>
       
       {dailyStreak >= 7 && (
-        <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-full">
-            <Trophy className="w-5 h-5 text-yellow-400" />
-            <span className="text-yellow-400 font-semibold">
+        <div className="mt-4 sm:mt-6 text-center">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-full">
+            <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold text-xs sm:text-sm">
               LEGENDARY STREAK! You're unstoppable! 👑
             </span>
           </div>

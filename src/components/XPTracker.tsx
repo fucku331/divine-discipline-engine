@@ -1,19 +1,34 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CustomTaskDialog } from '@/components/CustomTaskDialog';
 
 interface XPTrackerProps {
   onAddXP: (amount: number) => void;
 }
 
+interface CustomTask {
+  id: string;
+  name: string;
+  xp: number;
+  description?: string;
+}
+
 export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
   const { toast } = useToast();
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+  const [customTasks, setCustomTasks] = useState<CustomTask[]>(() => {
+    const saved = localStorage.getItem('customTasks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  }, [customTasks]);
 
   const domains = [
     {
@@ -95,6 +110,13 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
         { id: 'networking', name: '🌐 Networking or Social Engineering', xp: 5 },
         { id: 'emotional-infiltration', name: '🤝 Make someone open up fully', xp: 5 },
       ]
+    },
+    {
+      id: 'custom',
+      name: '⚡ CUSTOM TASKS',
+      maxXP: 0,
+      color: 'from-emerald-500 to-teal-500',
+      tasks: customTasks.map(task => ({ id: task.id, name: task.name, xp: task.xp }))
     }
   ];
 
@@ -124,12 +146,47 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
     }
   };
 
+  const handleAddCustomTask = (newTask: CustomTask) => {
+    setCustomTasks(prev => [...prev, newTask]);
+    toast({
+      title: "Custom Task Added! 🎯",
+      description: `Added "${newTask.name}" worth ${newTask.xp} XP`,
+      className: "bg-gradient-to-r from-emerald-800 to-teal-800 text-white border-emerald-500",
+    });
+  };
+
+  const handleDeleteCustomTask = (taskId: string) => {
+    setCustomTasks(prev => prev.filter(task => task.id !== taskId));
+    
+    // Remove from completed tasks if it was completed
+    const taskKey = `custom-${taskId}`;
+    if (completedTasks.has(taskKey)) {
+      setCompletedTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskKey);
+        return newSet;
+      });
+    }
+    
+    toast({
+      title: "Custom Task Deleted",
+      description: "Task removed from your list",
+      variant: "destructive",
+    });
+  };
+
   const getDomainXP = (domainId: string) => {
     return domains.find(d => d.id === domainId)?.tasks.reduce((total, task) => {
       const taskKey = `${domainId}-${task.id}`;
       return total + (completedTasks.has(taskKey) ? task.xp : 0);
     }, 0) || 0;
   };
+
+  // Update custom domain maxXP
+  const customDomain = domains.find(d => d.id === 'custom');
+  if (customDomain) {
+    customDomain.maxXP = customTasks.reduce((total, task) => total + task.xp, 0);
+  }
 
   return (
     <Card className="p-6 bg-slate-900/50 border-purple-500/30 backdrop-blur-sm">
@@ -138,7 +195,7 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
       </h2>
       
       <Tabs defaultValue="body" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6 bg-purple-900/50">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 mb-6 bg-purple-900/50">
           {domains.map(domain => (
             <TabsTrigger 
               key={domain.id} 
@@ -152,7 +209,7 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
 
         {domains.map(domain => {
           const currentXP = getDomainXP(domain.id);
-          const progress = (currentXP / domain.maxXP) * 100;
+          const progress = domain.maxXP > 0 ? (currentXP / domain.maxXP) * 100 : 0;
           
           return (
             <TabsContent key={domain.id} value={domain.id} className="space-y-4">
@@ -162,21 +219,30 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
                 </h3>
                 <div className="flex items-center justify-center gap-4">
                   <Badge variant="secondary" className="bg-purple-800/50 text-purple-200">
-                    {currentXP}/{domain.maxXP} XP
+                    {currentXP}/{domain.maxXP || currentXP} XP
                   </Badge>
-                  <div className="w-48 bg-purple-900/50 rounded-full h-2">
-                    <div 
-                      className={`h-full bg-gradient-to-r ${domain.color} rounded-full transition-all duration-500`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
+                  {domain.maxXP > 0 && (
+                    <div className="w-48 bg-purple-900/50 rounded-full h-2">
+                      <div 
+                        className={`h-full bg-gradient-to-r ${domain.color} rounded-full transition-all duration-500`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {domain.id === 'custom' && (
+                <div className="mb-4">
+                  <CustomTaskDialog onAddTask={handleAddCustomTask} />
+                </div>
+              )}
 
               <div className="grid gap-3">
                 {domain.tasks.map(task => {
                   const taskKey = `${domain.id}-${task.id}`;
                   const isCompleted = completedTasks.has(taskKey);
+                  const isCustomTask = domain.id === 'custom';
                   
                   return (
                     <div 
@@ -187,7 +253,7 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
                           : 'bg-purple-900/20 border-purple-500/30 hover:border-purple-400/50'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <span className={`text-sm ${isCompleted ? 'line-through text-green-400' : 'text-purple-200'}`}>
                           {task.name}
                         </span>
@@ -209,6 +275,17 @@ export const XPTracker = ({ onAddXP }: XPTrackerProps) => {
                         >
                           {isCompleted ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                         </Button>
+
+                        {isCustomTask && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteCustomTask(task.id)}
+                            className="h-8 w-8 p-0 border-red-500/50 text-red-400 hover:bg-red-500/20"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   );
